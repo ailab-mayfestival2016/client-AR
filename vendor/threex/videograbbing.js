@@ -4,7 +4,7 @@ var THREEx = THREEx || {}
  * Grab camera
  * @constructor
  */
-THREEx.VideoGrabbing = function(){
+THREEx.VideoGrabbing = function(file){
 
 	var domElement	= document.createElement('video')
 	domElement.setAttribute('autoplay', true)
@@ -12,7 +12,7 @@ THREEx.VideoGrabbing = function(){
 	domElement.setAttribute('muted', true)
 	this.domElement = domElement
 
-	domElement.src = 'videos/markerVideo.mp4'
+	domElement.src = file
 
 	domElement.style.zIndex = -1;
         domElement.style.position = 'absolute'

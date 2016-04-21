@@ -49,7 +49,7 @@ AR.Detector.prototype.detect = function(image){
   
   this.contours = CV.findContours(this.thres, this.binary);
 
-  this.candidates = this.findCandidates(this.contours, image.width * 0.20, 0.05, 10);
+  this.candidates = this.findCandidates(this.contours, image.width * 0.10, 0.05, 10);
   this.candidates = this.clockwiseCorners(this.candidates);
   this.candidates = this.notTooNear(this.candidates, 10);
 
@@ -155,8 +155,10 @@ AR.Detector.prototype.findMarkers = function(imageSrc, candidates, warpSize){
 };
 
 AR.Detector.prototype.getMarker = function(imageSrc, candidate){
+	//console.log("getMarker");
   var width = (imageSrc.width / 7) >>> 0,
       minZero = (width * width) >> 1,
+      //minZero = width*width,
       bits = [], rotations = [], distances = [],
       square, pair, inc, i, j;
 
@@ -166,6 +168,7 @@ AR.Detector.prototype.getMarker = function(imageSrc, candidate){
     for (j = 0; j < 7; j += inc){
       square = {x: j * width, y: i * width, width: width, height: width};
       if ( CV.countNonZero(imageSrc, square) > minZero){
+      //console.log("minZero");
         return null;
       }
     }
@@ -180,7 +183,11 @@ AR.Detector.prototype.getMarker = function(imageSrc, candidate){
       bits[i][j] = CV.countNonZero(imageSrc, square) > minZero? 1: 0;
     }
   }
-
+/*
+	for(var i=0;i<5;i++){
+		console.log(vsprintf("%d %d %d %d %d",bits[i]));
+	}
+*/
   rotations[0] = bits;
   distances[0] = this.hammingDistance( rotations[0] );
   
@@ -197,6 +204,7 @@ AR.Detector.prototype.getMarker = function(imageSrc, candidate){
   }
 
   if (0 !== pair.first){
+  //console.log("hammingDistance");
     return null;
   }
 
@@ -206,34 +214,46 @@ AR.Detector.prototype.getMarker = function(imageSrc, candidate){
 };
 
 AR.Detector.prototype.hammingDistance = function(bits){
-  var ids = [ [1,0,0,0,0], [1,0,1,1,1], [0,1,0,0,1], [0,1,1,1,0] ],
+  var ids = [[ [1,0,0,0,0], [1,0,1,1,1], [0,1,0,0,1], [0,1,1,1,0] ],
+  			 [ [1,0,0,0,0], [1,0,0,0,0], [0,1,0,0,1], [0,1,1,1,0] ],
+  			 [ [0,1,0,0,1], [1,0,1,1,1], [1,0,0,0,0], [1,0,0,0,0] ],
+  			 [ [1,0,0,0,0], [1,0,1,1,1], [1,0,1,1,1], [0,1,0,0,1] ]],
       dist = 0, sum, minSum, i, j, k;
-
-  for (i = 0; i < 5; ++ i){
-    minSum = Infinity;
+	var minminSum = Infinity;
+	for(var p = 0; p<ids.length; p++){
+		dist=0;
+  		for (i = 0; i < 5; ++ i){
+    		minSum = Infinity;
     
-    for (j = 0; j < 4; ++ j){
-      sum = 0;
+    		for (j = 0; j < 4; ++ j){
+      			sum = 0;
 
-      for (k = 0; k < 5; ++ k){
-          sum += bits[i][k] === ids[j][k]? 0: 1;
-      }
+      			for (k = 0; k < 5; ++ k){
+          			sum += bits[i][k] === ids[p][j][k]? 0: 1;
+      			}
 
-      if (sum < minSum){
-        minSum = sum;
-      }
-    }
+      			if (sum < minSum){
+        			minSum = sum;
+      			}
+    		}
 
-    dist += minSum;
-  }
-
-  return dist;
+    		dist += minSum;
+  		}
+  		
+  			//console.log(sprintf("dist %f",dist));
+  		if(dist<minminSum){
+  			minminSum = dist;
+  		}
+  	}
+	//console.log(sprintf("return %f",minminSum));
+  	return minminSum;
 };
 
 AR.Detector.prototype.mat2id = function(bits){
   var id = 0, i;
   
   for (i = 0; i < 5; ++ i){
+  	//console.log(vsprintf("%d %d %d %d %d",bits[i]));
     id <<= 1;
     id |= bits[i][1];
     id <<= 1;

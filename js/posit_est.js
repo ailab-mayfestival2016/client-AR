@@ -25,14 +25,6 @@ POSITEST.positionEstimater = function(mapdata){
 	
 	this.jsArucoMarker = new THREEx.JsArucoMarker();
 	
-	//memo
-	//ids マーカーのIDの配列
-	//rots threexにより得られた回転行列の配列
-		//各行がマーカーのu,v,w座標系でカメラ座標（各軸　右-上-手前　左手）の各基底を見たときのベクトル
-	//trans threexにより得られたtranslation
-		//カメラ座標（各軸それぞれ右、上、奥行き　左手でない！）における、焦点距離1.0、画像幅1.0
-		//マーカーの大きさ1.0としたときのマーカー中央の座標
-		//焦点距離不明なため、奥行きに自由度がある
 	console.log("est_pos defined");
 	this.est_pos = function (domElement){
 		//マーカーの取得
@@ -69,12 +61,17 @@ POSITEST.positionEstimater = function(mapdata){
 			var rot = pos.bestRotation;
 			var trans = pos.bestTranslation;
 			
+			console.log("rot");
+		for(var i=0;i<3;i++){
+			console.log(vsprintf("%.2f %.2f %.2f",rot[i]));
+		}
+		console.log(vsprintf("%.2f %.2f %.2f",trans));
 			//平均を求めるために足し合わせていく
 			var global_R = numeric.dot(_this.mat[id], numeric.transpose(rot));
 			R_ = numeric.add(R_, global_R);
 			
 			//マーカー→カメラのベクトル（カメラ座標系）
-			cam_vec.push(numeric.mul([-trans[0], -trans[1], trans[2]], _this.size[id]));
+			cam_vec.push(numeric.mul([-trans[0], -trans[1], -trans[2]], _this.size[id]));
 			
 			marker_vec.push(_this.pos[id]);
 			
@@ -92,19 +89,26 @@ POSITEST.positionEstimater = function(mapdata){
 		var ret = numeric.svd(R_);
 		R_ = numeric.dot(ret.U, numeric.transpose(ret.V));
 		
+		console.log("R_");
+		for(var i=0;i<3;i++){
+			console.log(vsprintf("%.2f %.2f %.2f",R_[i]));
+		}
+		
 		//カメラの位置を推定
 		var width = domElement.width;
 		
 		//初期値設定
-		var f = width;
+		var f = 1.0;
 		var A = [0.0,0.0,f]
-		var x = marker_vec[0] + numeric.dot(R_, numeric.mul(A, cam_vec[0]));
+		var x = numeric.add(marker_vec[0], numeric.dot(R_, numeric.mul(A, cam_vec[0])));
 		var prev_x = null;
 		
 		var n_iter = 0;
 		var max_iter = 100;
 		var min_err = 1.0;
 		while(n_iter<max_iter){
+			console.log(sprintf("f %.2f",f));
+			console.log(sprintf("x %.2f %.2f %.2f",x[0],x[1],x[2]));
 			var A = [0.0,0.0,f];
 			var I = [0.0,0.0,1.0];
 			//
@@ -114,11 +118,9 @@ POSITEST.positionEstimater = function(mapdata){
 			
 			for(var i = 0; i<counter; i++){
 				x_sum = numeric.add(x_sum, numeric.add(marker_vec[i], numeric.dot(R_, numeric.mul(A, cam_vec[i]))));
-				
 				f_up_sum = f_up_sum + numeric.dot( numeric.add(x,marker_vec[i]), numeric.dot(R_, numeric.mul(I,cam_vec[i])) );
-				f_low_sum = f_low_sum + cam_vec[i] * cam_vec[i];
+				f_low_sum = f_low_sum + cam_vec[i][2] * cam_vec[i][2];
 			}
-			
 			x = numeric.mul(x_sum, 1.0/counter);
 			f = f_up_sum / f_low_sum;
 			
@@ -133,7 +135,7 @@ POSITEST.positionEstimater = function(mapdata){
 		}
 		console.log(sprintf("performed %d iterations",n_iter));
 		
-		return {"x":x, "R":R_};
+		return {"x":x, "R":R_, "f":f};
 	}
 }
 

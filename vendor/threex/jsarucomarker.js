@@ -13,7 +13,6 @@ THREEx.JsArucoMarker = function(){
 	this.debugEnabled = false;
 	this.videoScaleDown = 2;
 	this.modelSize = 1.0; //unit length
-	this.newproperty = "hoge";
 
 	var canvasElement = document.createElement('canvas');
 	var context = canvasElement.getContext("2d");
@@ -69,6 +68,7 @@ THREEx.JsArucoMarker = function(){
 		// detect markers
 		var detector = new AR.Detector();
 		var markers = detector.detect(imageData);
+		console.log(sprintf("%d Markers detected at jsarucomarker",markers.length));
 
 		//////////////////////////////////////////////////////////////////////////////////
 		//		update debug

@@ -48,7 +48,7 @@ function ar_main(){
 	
 	//var imageGrabbing = new THREEx.ImageGrabbing("images/sample.jpg");
 	//var imageGrabbing = new THREEx.WebcamGrabbing();
-	var imageGrabbing = new THREEx.VideoGrabbing();
+	var imageGrabbing = new THREEx.VideoGrabbing("videos/sample.3gp");
 	
 	//画像を表示
 	document.body.appendChild(imageGrabbing.domElement)
@@ -85,11 +85,8 @@ function ar_main(){
 			//モデルサイズが大きくなるとX,Y,Z全てが大きくなる
 			//焦点距離が変化すると、奥行き(Z)のみ大きくなる
 			
-			//回転行列は、各行が順にカメラ右、下、奥行方向の方向ベクトルをオブジェクト（マーカー）座標系における
-			//値で表したものとなっている（論文では）
-			//ただし今回の実装では、途中でカメラ座標が上下逆になっているので、正確には右、上、手前で、写真の
-			//物体は画面の手前にあるようなわけわからん状態になっている
-			//マーカーの左上から右上の方向がｘ、左下への方向がｚの座標系における、カメラの右-上-手前の方向ベクトル？
+			//回転行列は、各行がそれぞれカメラ右、上、奥方向の基底ベクトルをマーカー座標系（右-上-紙面奥）において
+			//表現したものになっている
 			var rot = pos.bestRotation;
 			//transはマーカー中央の座標
 			//ただし、スケールとしてはfが1.0で画像横長さが1.0の状況で、マーカーの一辺の長さを1.0とした値が返ってきている(そういう風に変更した)
@@ -114,7 +111,7 @@ function ar_main(){
 		//clearInterval(timerID);
 	}
 	
-	timerID = setInterval(loop, 100);
+	timerID = setInterval(loop, 500);
 	console.log(sprintf("timerID is %d",timerID));
 	
 	console.log("end program");
@@ -125,30 +122,32 @@ function posest_main(){
 			{
 				"id":110,
 				"pos":[7.45,-2.25,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,0.0,-1.0],[0.0,1.0,0.0]],
+				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
 				"size":4.5
 			},
 			{
 				"id":47,
 				"pos":[2.25,-2.25,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,0.0,-1.0],[0.0,1.0,0.0]],
+				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
 				"size":4.5
 			},
 			{
 				"id":88,
 				"pos":[2.25,-7.45,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,0.0,-1.0],[0.0,1.0,0.0]],
+				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
 				"size":4.5
 			},
 			{
-				"id":576,
+				//"id":576,
+				"id":265,
 				"pos":[7.45,-7.45,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,0.0,-1.0],[0.0,1.0,0.0]],
+				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
 				"size":4.5
 			}
 		];
 	
-	var imageGrabbing = new THREEx.ImageGrabbing("images/test.jpg");
+	var imageGrabbing = new THREEx.ImageGrabbing("images/test2.jpg");
+	//var imageGrabbing = new THREEx.VideoGrabbing("videos/sample.3gp");
 	
 	//画像を表示
 	document.body.appendChild(imageGrabbing.domElement);
