@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>My first Three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<!-- include three.js -->
+		<script src="vendor/three.js/build/three.js"></script>
+		<script src='vendor/three.js/examples/js/libs/stats.min.js'></script>
+		
+		<!-- include sprintf -->
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.3/angular.min.js"></script>
+		<script src="vendor/sprintf/sprintf.js"></script>
+		<script src="vendor/sprintf/angular-sprintf.js"></script>
+
+		<!-- include js-aruco -->
+		<script src='vendor/js-aruco/svd.js'></script>
+		<script src='vendor/js-aruco/posit1-patched.js'></script>
+		<script src='vendor/js-aruco/cv.js'></script>
+		<script src='vendor/js-aruco/aruco.js'></script>
+
+		<!-- include some extensions -->
+		<script src='vendor/threex/webcamgrabbing.js'></script>
+		<script src='vendor/threex/imagegrabbing.js'></script>
+		<script src='vendor/threex/videograbbing.js'></script> 
+		<script src='vendor/threex/jsarucomarker.js'></script>
+		
+		<!-- include numeric -->
+		<script src="vendor/numeric.js"></script>
+		
+		<script src="js/posit_est.js"></script>
+		<script src="js/practice.js"></script>
+		<script>
+			posest_main();
+		</script>
+	</body>
+</html>
