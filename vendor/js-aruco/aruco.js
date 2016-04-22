@@ -214,10 +214,12 @@ AR.Detector.prototype.getMarker = function(imageSrc, candidate){
 };
 
 AR.Detector.prototype.hammingDistance = function(bits){
+/*
   var ids = [[ [1,0,0,0,0], [1,0,1,1,1], [0,1,0,0,1], [0,1,1,1,0] ],
   			 [ [1,0,0,0,0], [1,0,0,0,0], [0,1,0,0,1], [0,1,1,1,0] ],
   			 [ [0,1,0,0,1], [1,0,1,1,1], [1,0,0,0,0], [1,0,0,0,0] ],
-  			 [ [1,0,0,0,0], [1,0,1,1,1], [1,0,1,1,1], [0,1,0,0,1] ]],
+  			 [ [1,0,0,0,0], [1,0,1,1,1], [1,0,1,1,1], [0,1,0,0,1] ]],*/
+  	var ids = [[ [1,0,0,0,0], [1,0,1,1,1], [0,1,0,0,1], [0,1,1,1,0] ]],
       dist = 0, sum, minSum, i, j, k;
 	var minminSum = Infinity;
 	for(var p = 0; p<ids.length; p++){

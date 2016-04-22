@@ -47,8 +47,8 @@ function ar_main(){
 	var timerID = -1;
 	
 	//var imageGrabbing = new THREEx.ImageGrabbing("images/sample.jpg");
-	//var imageGrabbing = new THREEx.WebcamGrabbing();
-	var imageGrabbing = new THREEx.VideoGrabbing("videos/sample.3gp");
+	var imageGrabbing = new THREEx.WebcamGrabbing();
+	//var imageGrabbing = new THREEx.VideoGrabbing("videos/sample.3gp");
 	
 	//‰æ‘œ‚ð•\Ž¦
 	document.body.appendChild(imageGrabbing.domElement)
