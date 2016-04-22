@@ -1,6 +1,4 @@
-console.log("load webcamgrabbing");
-
-var THREEx = THREEx || {};
+var THREEx = THREEx || {}
 
 // shim
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
@@ -11,7 +9,7 @@ window.URL = window.URL || window.webkitURL;
  * @constructor
  */
 THREEx.WebcamGrabbing = function(){
-	console.log("AAAAAAAAAAAAA");
+
 	//////////////////////////////////////////////////////////////////////////////////
 	//		Comments
 	//////////////////////////////////////////////////////////////////////////////////
@@ -79,8 +77,7 @@ THREEx.WebcamGrabbing = function(){
         }, 500)
 
         // get the media sources
-        //MediaStreamTrack.getSources(function(sourceInfos) {
-        navigator.mediaDevices.enumerateDevices().then(function(sourceInfos){
+        MediaStreamTrack.getSources(function(sourceInfos) {
                 // define getUserMedia() constraints
                 var constraints = {
                         video: true,
@@ -102,7 +99,7 @@ THREEx.WebcamGrabbing = function(){
                 }
 
                 // try to get user media
-                MediaDevices.getUserMedia( constraints, function(stream){
+                navigator.getUserMedia( constraints, function(stream){
                         domElement.src = URL.createObjectURL(stream);
                 }, function(error) {
                         console.error("Cant getUserMedia()! due to ", error);
@@ -111,5 +108,3 @@ THREEx.WebcamGrabbing = function(){
 
 	this.domElement = domElement
 }
-
-console.log("finish load webcamgrabbing");
