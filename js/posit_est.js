@@ -59,19 +59,26 @@ POSITEST.positionEstimater = function(mapdata){
 			
 			var pos = _this.jsArucoMarker.getMarkerPosition(marker);
 			var rot = pos.bestRotation;
+			//もともとのカメラ、マーカー座標系が右手系なので修正
+			rot = [[rot[0][0], rot[0][1], -rot[0][2]],
+					[rot[1][0], rot[1][1], -rot[1][2]],
+					[-rot[2][0], -rot[2][1], rot[2][2]]];
 			var trans = pos.bestTranslation;
 			
+			//FOR DEBUG
+			/*
 			console.log("rot");
-		for(var i=0;i<3;i++){
-			console.log(vsprintf("%.2f %.2f %.2f",rot[i]));
-		}
-		console.log(vsprintf("%.2f %.2f %.2f",trans));
+			for(var i=0;i<3;i++){
+				console.log(vsprintf("%.2f %.2f %.2f",rot[i]));
+			}
+			console.log(vsprintf("%.2f %.2f %.2f",trans));
+			*/
 			//平均を求めるために足し合わせていく
 			var global_R = numeric.dot(_this.mat[id], numeric.transpose(rot));
 			R_ = numeric.add(R_, global_R);
 			
 			//マーカー→カメラのベクトル（カメラ座標系）
-			cam_vec.push(numeric.mul([-trans[0], -trans[1], -trans[2]], _this.size[id]));
+			cam_vec.push(numeric.mul([-trans[0], -trans[1], trans[2]], _this.size[id]));
 			
 			marker_vec.push(_this.pos[id]);
 			
@@ -89,9 +96,15 @@ POSITEST.positionEstimater = function(mapdata){
 		var ret = numeric.svd(R_);
 		R_ = numeric.dot(ret.U, numeric.transpose(ret.V));
 		
+		//FOR DEBUG
 		console.log("R_");
 		for(var i=0;i<3;i++){
 			console.log(vsprintf("%.2f %.2f %.2f",R_[i]));
+		}
+		for(var i=0;i<counter;i++){
+			console.log(sprintf("--- marker %d ---",i));
+			console.log(vsprintf("d %.2f %.2f %.2f",cam_vec[i]));
+			console.log(vsprintf("m %.2f %.2f %.2f",marker_vec[i]));
 		}
 		
 		//カメラの位置を推定
@@ -104,25 +117,44 @@ POSITEST.positionEstimater = function(mapdata){
 		var prev_x = null;
 		
 		var n_iter = 0;
-		var max_iter = 100;
+		var max_iter = 1000;
 		var min_err = 1.0;
 		while(n_iter<max_iter){
 			console.log(sprintf("f %.2f",f));
 			console.log(sprintf("x %.2f %.2f %.2f",x[0],x[1],x[2]));
-			var A = [0.0,0.0,f];
+			var A = [1.0,1.0,f];
 			var I = [0.0,0.0,1.0];
+			//ヘッセ行列用バッファ
+			var B = [[0.0,0.0,0.0,0.0],[0.0,0.0,0.0,0.0],[0.0,0.0,0.0,0.0],[0.0,0.0,0.0,0.0]];
+			//勾配用バッファ
+			var D = [0.0,0.0,0.0,0.0];
 			//
-			var x_sum = [0.0,0.0,0.0];
-			var f_up_sum = 0.0;
-			var f_low_sum = 0.0;
-			
-			for(var i = 0; i<counter; i++){
-				x_sum = numeric.add(x_sum, numeric.add(marker_vec[i], numeric.dot(R_, numeric.mul(A, cam_vec[i]))));
-				f_up_sum = f_up_sum + numeric.dot( numeric.add(x,marker_vec[i]), numeric.dot(R_, numeric.mul(I,cam_vec[i])) );
-				f_low_sum = f_low_sum + cam_vec[i][2] * cam_vec[i][2];
+			for(var i=0;i<counter;i++){
+				var m = marker_vec[i];
+				var d = cam_vec[i];
+				//
+				var RAfd = numeric.dot(R_, numeric.mul(A, d));
+				var RId = numeric.dot(R_, numeric.mul(I, d));
+				//勾配
+				var dJdx = numeric.sub(x, numeric.add(m, RAfd));
+				var dJdf = - numeric.dot(dJdx, RId);
+				D[0]+=dJdx[0]; D[1]+=dJdx[1]; D[2]+=dJdx[2]; D[3]+=dJdf;
+				//ヘッセ行列
+				B[0][0]+=1.0; B[1][1]+=1.0; B[2][2]+=1.0; //ddJddx
+				var ddJdxdf = numeric.mul(RId, -1.0);
+				B[3][0]+=ddJdxdf[0]; B[0][3]+=ddJdxdf[0];
+				B[3][1]+=ddJdxdf[1]; B[1][3]+=ddJdxdf[1];
+				B[3][2]+=ddJdxdf[2]; B[2][3]+=ddJdxdf[2];
+				B[3][3]+=numeric.dot(RId,RId);//ddJddf
 			}
-			x = numeric.mul(x_sum, 1.0/counter);
-			f = f_up_sum / f_low_sum;
+			//
+			var Binv = numeric.inv(B);
+			var delta = numeric.mul(numeric.dot(Binv, D), -1.0); //準ニュートン法
+			
+			prev_x = numeric.clone(x);
+			x[0]+=delta[0]; x[1]+=delta[1]; x[2]+=delta[2];
+			f += delta[3];
+			
 			
 			//終了処理
 			if(prev_x == null){
