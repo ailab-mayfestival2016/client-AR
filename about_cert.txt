@@ -1,0 +1,4 @@
+http://www.hizlab.net/app/install/sslcert.html
+を参考に行った
+
+パスワードは iloveailab
