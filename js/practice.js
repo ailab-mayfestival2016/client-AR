@@ -118,36 +118,17 @@ function ar_main(){
 }
 
 function posest_main(){
-	var map = [
-			{
-				"id":110,
-				"pos":[7.45,-2.25,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
-				"size":4.5
-			},
-			{
-				"id":47,
-				"pos":[2.25,-2.25,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
-				"size":4.5
-			},
-			{
-				"id":88,
-				"pos":[2.25,-7.45,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
-				"size":4.5
-			},
-			{
-				//"id":576,
-				"id":265,
-				"pos":[7.45,-7.45,0.0],
-				"mat":[[1.0,0.0,0.0], [0.0,1.0,0.0],[0.0,0.0,1.0]],
-				"size":4.5
-			}
-		];
-	
-	var imageGrabbing = new THREEx.ImageGrabbing("images/test2.jpg");
+	var map = [{"id":0, "pos":[-7.5,7.5,0.0], "mat":[[1.0,0.0,0.0], [0.0,1.0,0.0], [0.0,0.0,1.0]], "size":5.0},
+		{"id":10, "pos":[7.5,7.5,0.0], "mat":[[1.0,0.0,0.0], [0.0,1.0,0.0], [0.0,0.0,1.0]], "size":5.0},
+		{"id":20, "pos":[-7.5,-7.5,0.0], "mat":[[1.0,0.0,0.0], [0.0,1.0,0.0], [0.0,0.0,1.0]], "size":5.0},
+		{"id":30, "pos":[7.5,-7.5,0.0], "mat":[[1.0,0.0,0.0], [0.0,1.0,0.0], [0.0,0.0,1.0]], "size":5.0},
+		{"id":40, "pos":[0.0,15.2,5.5], "mat":[[1.0,0.0,0.0], [0.0,0.0,1.0], [0.0,-1.0,0.0]], "size":5.0},
+		{"id":50, "pos":[15.5,0.0,5.0], "mat":[[0.0,-1.0,0.0], [0.0,0.0,1.0], [-1.0,0.0,0.0]], "size":5.0},
+		{"id":60, "pos":[0.0,-14.5,5.0], "mat":[[-1.0,0.0,0.0], [0.0,0.0,1.0], [0.0,1.0,0.0]], "size":5.0},
+		{"id":70, "pos":[-17.5,0.0,5.0], "mat":[[0.0,1.0,0.0], [0.0,0.0,1.0], [1.0,0.0,0.0]], "size":5.0}]
+	//var imageGrabbing = new THREEx.ImageGrabbing("images/test2.jpg");
 	//var imageGrabbing = new THREEx.VideoGrabbing("videos/sample.3gp");
+	var imageGrabbing = new THREEx.WebcamGrabbing();
 	
 	//‰æ‘œ‚ð•\Ž¦
 	document.body.appendChild(imageGrabbing.domElement);
@@ -158,8 +139,15 @@ function posest_main(){
 	
 	var timerID = setInterval(function (){
 			var pos = estimater.est_pos(domElement);
-			if(!(pos==null)){
-				clearInterval(timerID);
+			
+			if(pos!=null){
+				console.log("-----CAMERA POSITION-------")
+				console.log(vsprintf("position:%5.2f, %5.2f, %5.2f",pos["x"]));
+				console.log("rotation");
+				for(var i=0;i<3;i++){
+					console.log(vsprintf("%5.2f, %5.2f, %5.2f",pos["R"][i]));
+				}
+				console.log(sprintf("f %.2f",pos["f"]));
 			}
 		}, 1000);
 }
