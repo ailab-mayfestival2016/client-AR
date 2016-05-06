@@ -49,7 +49,7 @@ POSITEST.positionEstimater = function(mapdata){
 		var counter = 0;
 		markers.forEach(function (marker){
 			var id = marker.id;
-			console.log(sprintf("detect Marker ID %d",id));
+			//console.log(sprintf("detect Marker ID %d",id));
 			
 			//想定外のマーカーなら除外
 			if(!(id in _this.mat)){
@@ -97,6 +97,7 @@ POSITEST.positionEstimater = function(mapdata){
 		R_ = numeric.dot(ret.U, numeric.transpose(ret.V));
 		
 		//FOR DEBUG
+		/*
 		console.log("R_");
 		for(var i=0;i<3;i++){
 			console.log(vsprintf("%.2f %.2f %.2f",R_[i]));
@@ -105,7 +106,7 @@ POSITEST.positionEstimater = function(mapdata){
 			console.log(sprintf("--- marker %d ---",i));
 			console.log(vsprintf("d %.2f %.2f %.2f",cam_vec[i]));
 			console.log(vsprintf("m %.2f %.2f %.2f",marker_vec[i]));
-		}
+		}*/
 		
 		//カメラの位置を推定
 		var width = domElement.width;
@@ -120,8 +121,8 @@ POSITEST.positionEstimater = function(mapdata){
 		var max_iter = 1000;
 		var min_err = 1.0;
 		while(n_iter<max_iter){
-			console.log(sprintf("f %.2f",f));
-			console.log(sprintf("x %.2f %.2f %.2f",x[0],x[1],x[2]));
+			//console.log(sprintf("f %.2f",f));
+			//console.log(sprintf("x %.2f %.2f %.2f",x[0],x[1],x[2]));
 			var A = [1.0,1.0,f];
 			var I = [0.0,0.0,1.0];
 			//ヘッセ行列用バッファ
@@ -165,7 +166,7 @@ POSITEST.positionEstimater = function(mapdata){
 			//更新処理
 			n_iter = n_iter + 1;
 		}
-		console.log(sprintf("performed %d iterations",n_iter));
+		//console.log(sprintf("performed %d iterations",n_iter));
 		
 		return {"x":x, "R":R_, "f":f};
 	}
